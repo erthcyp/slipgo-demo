@@ -1,0 +1,206 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SlipGo — mock receipts for the demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&family=Noto+Sans+Thai:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{--ink:#111721;--slate:#6E7887;--line:#D7DBE0;--page:#F1F2EF;--signage:#17457F;--barrier:#E8A317}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 1rem 4rem}
+header{background:var(--signage);color:#fff;padding:1.3rem 0 0}
+h1{font:700 30px/1 "Barlow Condensed";margin:0 0 .25rem}
+.sub{font:600 10px/1.6 "IBM Plex Mono";letter-spacing:.16em;color:#BFD0E6}
+.arm{height:11px;margin-top:1rem;background:repeating-linear-gradient(115deg,var(--barrier) 0 13px,#F5F3EE 13px 26px);
+  border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.how{background:#FBF0D8;border:1.5px solid var(--barrier);border-left:6px solid var(--barrier);
+  padding:.85rem;margin:1.4rem 0 1.8rem;font-size:13px;line-height:1.55}
+.how b{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:#7A5200;margin-bottom:.4rem}
+.how ol{margin:.5rem 0 0;padding-left:1.2rem}
+.how li{margin-bottom:.2rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.4rem}
+
+.rc{background:#fff;padding:1.1rem 1.1rem 1.6rem;
+  font:400 12px/1.65 "IBM Plex Mono","Noto Sans Thai",monospace;color:#1b1b1b;
+  box-shadow:0 2px 8px rgba(17,23,33,.09);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),
+    93% 100%,86% calc(100% - 8px),79% 100%,72% calc(100% - 8px),65% 100%,58% calc(100% - 8px),
+    51% 100%,44% calc(100% - 8px),37% 100%,30% calc(100% - 8px),23% 100%,16% calc(100% - 8px),
+    9% 100%,2% calc(100% - 8px),0 100%)}
+.rc .nm{font:700 19px/1.2 "Barlow Condensed";text-align:center;letter-spacing:.03em}
+.rc .th{font:500 12px/1.4 "Noto Sans Thai";text-align:center;color:#444}
+.rc .addr{text-align:center;font-size:10px;color:#666;margin-top:.2rem}
+.rc hr{border:0;border-top:1px dashed #bbb;margin:.7rem 0}
+.rc .li{display:flex;justify-content:space-between;gap:.6rem}
+.rc .li span:last-child{white-space:nowrap}
+.rc .tot{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-top:.2rem}
+.rc .ft{text-align:center;font-size:10px;color:#666;margin-top:.6rem;line-height:1.6}
+.rc .bars{margin-top:.7rem;height:26px;
+  background:repeating-linear-gradient(90deg,#1b1b1b 0 2px,#fff 2px 4px,#1b1b1b 4px 5px,#fff 5px 9px)}
+.rc .barno{text-align:center;font-size:9px;letter-spacing:.14em;margin-top:.2rem;color:#444}
+
+.cap{font:600 10px/1.4 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);margin-top:.5rem;text-align:center}
+.cap.over{color:#1F6B3B}
+.cap.under{color:#B33A2B}
+
+footer{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--line);
+  font:400 11px/1.8 "IBM Plex Mono";color:var(--slate)}
+@media print{header,.how,footer,.cap{display:none}body{background:#fff}
+  .grid{grid-template-columns:repeat(3,1fr)}.rc{box-shadow:none;border:1px solid #ddd}}
+</style>
+
+<header>
+  <div class="wrap">
+    <h1>Mock ticket &amp; receipts</h1>
+    <div class="sub">FOR DEMONSTRATING THE SLIPGO FLOW · NOTHING HERE IS REAL</div>
+  </div>
+  <div class="arm"></div>
+</header>
+
+<div class="wrap">
+  <div class="how">
+    <b>HOW TO USE THESE</b>
+    These are made up. No shop issued them, no car was parked and no money changed hands. They exist so the
+    flow can be shown without buying anything first.
+    <ol>
+      <li>Scan the QR on the parking ticket below. It opens the SlipGo demo, the same way a real ticket QR opens the mall's payment page</li>
+      <li>The demo shows the parking session and the fee due</li>
+      <li>Upload or photograph one of the slips below. Slips from joined shops carry a SlipGo code, so they clear instantly. Slips without one go to OUR DESK to be checked by hand</li>
+      <li>Watch the fee drop to zero once the ฿500 threshold is reached</li>
+      <li>Photo receipts sit in OUR DESK until someone approves them by hand — that manual step is the whole point of Tier 3</li>
+    </ol>
+  </div>
+
+  <div style="margin-bottom:2rem">
+    <div style="font:600 10px/1 'IBM Plex Mono';letter-spacing:.14em;color:#6E7887;margin-bottom:.7rem">
+      START HERE &middot; THE PARKING TICKET</div>
+    <div class="rc" style="max-width:300px">
+      <div class="nm">FUTURE PARK &amp; ZPELL</div>
+      <div class="th">บัตรจอดรถยนต์ &middot; Parking Ticket</div>
+      <div class="addr">Date 14/09/26 &nbsp; Time 14:54</div>
+      <hr>
+      <div style="text-align:center;margin:.4rem 0">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYwAAAGMAQAAAADhQqjnAAACB0lEQVR42u2cS47DIBBEq0bZww3m/sfyDeAENQs+Bmc2QGYxUrWiyHJ4m1apummbUFiM/IXlMGLEiJG/QyANThakBIR6R6nenBc4yUaW4gUAoYgJBBjETPVrQPMCJ9nIHkKSEQB0UQmMkFR8rNzvC5wxIzs+Nkexr7uYOmNGPqoxAspEJgDl6IwZ+ZTGNLtW7ccA5ciQZjdzko0c7St//3hfaeTMxzR3X+rlshdNZ8zIoY8NlqUEpXYTUIv6k+xjRjY11r/fL1qJbCutMSPrGiuz/TrhD3UsVtQ1uZz7MSMHGuvV8K6Pad4UuFYaOezH+rbxUSXv7SSa3TnJRpYRXaxulsAIkrrYJTcq0Bkzsl8r53J57zEHT7OPGTns+cdCOa0IGnVojRlZjFd1rUxloj02Un2NBwLGMSxDcpKNbCOM0NVf4Kl9PiP4XZ2N3+7HjBztK/uwYhhTYBrPuh8zctKPobdbeMwuaifmfszIR3ysDyvCLbyp87fGjOz52BDTs6QwlctWRp1kI+s+No8p3nuwyeisMSMbSJ+MtUlF+Sb53A44Y0aWo75rTdQDbmw18T42UlQXkjNm5CNnRlQOVxZFNV311/udMSPnGuOgtNvfckQ72OskG9nT2HguiSGxH4IrSisFNEc5Y0b2kMwStc/PfAz/+zMmRmfMyGrQ/w1lxIiRf478AGua7wlIzZMkAAAAAElFTkSuQmCC" alt="QR code that opens the SlipGo demo" style="width:168px;display:block;margin:0 auto">
+      </div>
+      <div style="text-align:center;font-size:10px;letter-spacing:.1em;color:#444">Ticket 1526082916540460</div>
+      <hr>
+      <div class="th" style="font-size:11px;text-align:center;line-height:1.7">
+        สแกน QR Code นี้เพื่อตรวจสอบ และชำระค่าจอดรถ<br>
+        <span style="font-family:'IBM Plex Mono';font-size:9.5px;color:#666">
+          Scan this QR Code to check and pay parking fee</span>
+      </div>
+      <hr>
+      <div class="ft" style="text-align:left">
+        จอดฟรี 4 ชั่วโมงแรก &middot; First 4 hours free<br>
+        ช้อปครบ 500 บาทขึ้นไป เพิ่มชั่วโมงจอดได้<br>
+        <span style="font-family:'IBM Plex Mono';font-size:9.5px">Spend 500 baht or more for extra hours</span>
+      </div>
+    </div>
+    <div class="cap">SCAN THIS &middot; IT OPENS THE DEMO</div>
+  </div>
+
+  <div class="grid">
+
+    <div>
+      <div class="rc">
+        <div class="nm">UNIQLO</div>
+        <div class="th">ฟิวเจอร์พาร์ค รังสิต ชั้น 2</div>
+        <div class="addr">TAX ID 0105546091823</div>
+        <hr>
+        <div class="li"><span>AIRism Tee x2</span><span>590.00</span></div>
+        <div class="li"><span>Socks 3pk</span><span>200.00</span></div>
+        <hr>
+        <div class="li"><span>Subtotal</span><span>790.00</span></div>
+        <div class="li"><span>VAT 7% incl.</span><span>51.68</span></div>
+        <div class="tot"><span>TOTAL</span><span>฿790.00</span></div>
+        <hr>
+        <div class="li"><span>CASH</span><span>1000.00</span></div>
+        <div class="li"><span>CHANGE</span><span>210.00</span></div>
+        <div class="ft">14/09/2026 15:02 · POS 04 · #221845</div>
+        <hr>
+        <div style="text-align:center">
+          <div style="font:600 8.5px/1 'IBM Plex Mono';letter-spacing:.16em;color:#666">SLIPGO PARKING CREDIT</div>
+          <div style="font:700 21px/1.3 'IBM Plex Mono';letter-spacing:.2em">T8HJC3</div>
+          <div style="font:400 8.5px/1.4 'IBM Plex Mono';color:#666">single use · valid today only</div>
+        </div>
+        <div class="bars"></div>
+        <div class="barno">2026 0914 221845</div>
+      </div>
+      <div class="cap over">฿790 · JOINED SHOP · CODE ON THE SLIP · INSTANT</div>
+    </div>
+
+    <div>
+      <div class="rc">
+        <div class="nm">MK RESTAURANT</div>
+        <div class="th">ฟิวเจอร์พาร์ค รังสิต ชั้น 3</div>
+        <div class="addr">TAX ID 0107537000289</div>
+        <hr>
+        <div class="li"><span>ชุดสุกี้รวม</span><span>380.00</span></div>
+        <div class="li"><span>เป็ดย่าง (ครึ่ง)</span><span>180.00</span></div>
+        <div class="li"><span>น้ำเปล่า x2</span><span>60.00</span></div>
+        <hr>
+        <div class="li"><span>Subtotal</span><span>620.00</span></div>
+        <div class="li"><span>Service 0%</span><span>0.00</span></div>
+        <div class="tot"><span>TOTAL</span><span>฿620.00</span></div>
+        <hr>
+        <div class="li"><span>QR PAYMENT</span><span>620.00</span></div>
+        <div class="ft">14/09/2026 18:44 · TABLE 12 · #4471</div>
+        <hr>
+        <div style="text-align:center">
+          <div style="font:600 8.5px/1 'IBM Plex Mono';letter-spacing:.16em;color:#666">SLIPGO PARKING CREDIT</div>
+          <div style="font:700 21px/1.3 'IBM Plex Mono';letter-spacing:.2em">R5YBN8</div>
+          <div style="font:400 8.5px/1.4 'IBM Plex Mono';color:#666">single use · valid today only</div>
+        </div>
+        <div class="bars"></div>
+        <div class="barno">2026 0914 004471</div>
+      </div>
+      <div class="cap over">฿620 · JOINED SHOP · CODE ON THE SLIP · INSTANT</div>
+    </div>
+
+    <div>
+      <div class="rc">
+        <div class="nm">BOOTS</div>
+        <div class="th">ฟิวเจอร์พาร์ค รังสิต ชั้น G</div>
+        <div class="addr">TAX ID 0105539114732</div>
+        <hr>
+        <div class="li"><span>Sunscreen SPF50</span><span>165.00</span></div>
+        <div class="li"><span>Hand cream</span><span>100.00</span></div>
+        <hr>
+        <div class="li"><span>Subtotal</span><span>265.00</span></div>
+        <div class="tot"><span>TOTAL</span><span>฿265.00</span></div>
+        <hr>
+        <div class="li"><span>CARD ****4417</span><span>265.00</span></div>
+        <div class="ft">14/09/2026 15:20 · POS 02 · #90233<br>Points earned 10</div>
+        <div class="bars"></div>
+        <div class="barno">2026 0914 090233</div>
+      </div>
+      <div class="cap under">฿265 · NO CODE · GOES TO OUR DESK FOR CHECKING</div>
+    </div>
+
+    <div>
+      <div class="rc">
+        <div class="nm">KANOM THAI</div>
+        <div class="th">ฟิวเจอร์พาร์ค รังสิต ชั้น G</div>
+        <div class="addr">ร้านค้าอิสระ · ไม่มีระบบ POS</div>
+        <hr>
+        <div class="li"><span>ขนมชั้น</span><span>80.00</span></div>
+        <div class="li"><span>ทองหยิบ</span><span>100.00</span></div>
+        <hr>
+        <div class="tot"><span>รวม</span><span>฿180.00</span></div>
+        <hr>
+        <div class="li"><span>เงินสด</span><span>200.00</span></div>
+        <div class="li"><span>ทอน</span><span>20.00</span></div>
+        <div class="ft">14/09/2026 14:12<br>เขียนด้วยมือ · ไม่มีเลขที่ใบเสร็จ</div>
+      </div>
+      <div class="cap under">฿180 · HANDWRITTEN, NO CODE · THE HARD CASE</div>
+    </div>
+
+  </div>
+
+  <footer>
+    Mock receipts for the SlipGo concierge test · DES:324 · SIIT, Thammasat University<br>
+    Invented for demonstration. No shop issued these and no transaction took place.
+  </footer>
+</div>

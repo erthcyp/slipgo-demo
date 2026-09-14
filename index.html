@@ -3,41 +3,36 @@
 <title>SlipGo — concierge test prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 :root{
   --ink:#111721; --ink-soft:#3A4351; --slate:#6E7887; --line:#D7DBE0;
-  --page:#F1F2EF; --card:#FFFFFF; --signage:#17457F; --barrier:#E8A317; --alert:#B33A2B;
-  --slip:#FBFAF7;
+  --page:#F1F2EF; --card:#FFFFFF; --signage:#17457F; --barrier:#E8A317;
+  --alert:#B33A2B; --good:#1F6B3B; --slip:#FBFAF7;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{
-  background:var(--page); color:var(--ink);
-  font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  padding-bottom:4rem;
-}
+body{background:var(--page);color:var(--ink);
+  font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem}
 .wrap{max-width:460px;margin:0 auto;padding:0 1rem}
 
-/* masthead */
 header{background:var(--signage);color:#fff;padding:1.1rem 0 0}
 header .wrap{display:flex;align-items:baseline;gap:.6rem}
-h1{font:700 30px/1 "Barlow Condensed";margin:0;letter-spacing:.01em}
+h1{font:700 30px/1 "Barlow Condensed";margin:0}
 .tag{font:600 10px/1 "IBM Plex Mono";letter-spacing:.18em;color:#BFD0E6}
 .arm{height:11px;margin-top:.9rem;
   background:repeating-linear-gradient(115deg,var(--barrier) 0 13px,#F5F3EE 13px 26px);
   border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
 
-/* role switch */
-nav{display:flex;gap:0;margin:1.1rem 0 1.4rem;border:1.5px solid var(--ink);background:var(--card)}
-nav button{
-  flex:1;border:0;background:none;cursor:pointer;padding:.72rem .3rem;
-  font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);
-  border-right:1.5px solid var(--ink);
-}
+.demo-flag{background:#FBF0D8;border:1.5px solid var(--barrier);border-left:6px solid var(--barrier);
+  padding:.75rem .85rem;margin:1.1rem 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+.demo-flag b{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:#7A5200;margin-bottom:.35rem}
+
+nav{display:flex;margin:1.1rem 0 1.4rem;border:1.5px solid var(--ink);background:var(--card)}
+nav button{flex:1;border:0;background:none;cursor:pointer;padding:.72rem .3rem;
+  font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);border-right:1.5px solid var(--ink)}
 nav button:last-child{border-right:0}
 nav button[aria-selected="true"]{background:var(--signage);color:#fff}
 nav button:focus-visible{outline:3px solid var(--barrier);outline-offset:-3px}
@@ -46,68 +41,117 @@ h2{font:700 23px/1.15 "Barlow Condensed";margin:0 0 .2rem}
 .lede{color:var(--ink-soft);font-size:14px;margin:0 0 1.2rem}
 
 label{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.13em;color:var(--slate);margin:0 0 .35rem}
-input{
-  width:100%;padding:.7rem .8rem;border:1.5px solid var(--line);background:var(--card);
-  font:500 17px/1.2 "IBM Plex Sans";color:var(--ink);border-radius:0;
-}
+input[type=text],input[type=number]{width:100%;padding:.7rem .8rem;border:1.5px solid var(--line);
+  background:var(--card);font:500 17px/1.2 "IBM Plex Sans";color:var(--ink);border-radius:0}
 input:focus{outline:0;border-color:var(--signage)}
 .field{margin-bottom:1rem}
 
-button.go{
-  width:100%;padding:.85rem;border:0;background:var(--signage);color:#fff;cursor:pointer;
-  font:700 17px/1 "Barlow Condensed";letter-spacing:.04em;
-}
-button.go:disabled{background:var(--line);color:var(--slate);cursor:not-allowed}
+button.go{width:100%;padding:.85rem;border:0;background:var(--signage);color:#fff;cursor:pointer;
+  font:700 17px/1 "Barlow Condensed";letter-spacing:.04em}
 button.go.amber{background:var(--barrier);color:var(--ink)}
+button.go:disabled{background:var(--line);color:var(--slate);cursor:not-allowed}
 button.go:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-button.ghost{
-  width:100%;padding:.6rem;margin-top:.5rem;background:none;border:1.5px solid var(--line);
-  cursor:pointer;font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);
-}
+button.ghost{width:100%;padding:.6rem;margin-top:.5rem;background:none;border:1.5px solid var(--line);
+  cursor:pointer;font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate)}
+button.sm{padding:.42rem .8rem;border:1.5px solid var(--line);background:var(--card);cursor:pointer;
+  font:600 10px/1 "IBM Plex Mono";letter-spacing:.09em;color:var(--ink)}
+button.sm.ok{border-color:var(--good);color:var(--good)}
+button.sm.no{border-color:var(--alert);color:var(--alert)}
 
-/* the slip — the one piece of boldness */
-.slip{
-  background:var(--slip);padding:1.1rem 1.1rem 1.5rem;margin:1.2rem 0;
-  box-shadow:0 1px 0 var(--line);
+/* the mall's own screen — deliberately plain, not our brand */
+.mall{background:#fff;border:1.5px solid #c9ccd1;padding:1rem;font-family:"IBM Plex Sans","Noto Sans Thai",sans-serif}
+.mall .brand{font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:#666;text-align:center}
+.mall .th{font:500 13px/1.5 "Noto Sans Thai";color:#555;text-align:center;margin-top:.2rem}
+.mall hr{border:0;border-top:1px dashed #ccc;margin:.8rem 0}
+.mall .kv{display:flex;justify-content:space-between;font-size:13px;padding:.22rem 0;color:#333}
+.mall .kv b{font-weight:600}
+.mall .due{display:flex;justify-content:space-between;align-items:baseline;margin-top:.5rem}
+.mall .due .l{font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:#666}
+.mall .due .n{font:700 38px/1 "Barlow Condensed"}
+.mall .due .n.free{color:var(--good)}
+.mall .was{font:400 12px/1 "IBM Plex Mono";color:var(--slate);text-decoration:line-through;margin-left:.5rem}
+
+.layer{background:var(--signage);color:#fff;padding:.9rem 1rem;margin-top:.7rem}
+.layer .hd{display:flex;justify-content:space-between;align-items:baseline}
+.layer .hd b{font:700 18px/1 "Barlow Condensed";color:#fff}
+.layer .hd span{font:600 9px/1 "IBM Plex Mono";letter-spacing:.12em;color:var(--barrier)}
+.layer .msg{font-size:13px;color:#DCE4EF;margin-top:.35rem;line-height:1.5}
+.track{height:8px;background:#0F3059;margin-top:.8rem}
+.track i{display:block;height:100%;background:var(--barrier);transition:width .45s cubic-bezier(.4,0,.2,1)}
+.track-k{font:400 10px/1 "IBM Plex Mono";color:#8FA9C8;margin-top:.4rem}
+
+.addhd{font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:var(--slate);margin:1.3rem 0 .6rem}
+.manual{margin-top:.8rem;border-top:1px solid var(--line);padding-top:.6rem}
+.manual summary{font:600 10px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);cursor:pointer}
+.manual summary:focus-visible{outline:3px solid var(--barrier);outline-offset:2px}
+.nocode{font-size:11.5px;color:var(--slate);margin-top:.6rem;line-height:1.5}
+.nocode a{color:var(--signage)}
+.two{display:grid;grid-template-columns:1fr;gap:.8rem}
+@media(min-width:620px){.two{grid-template-columns:1fr 1fr}}
+.halfbox{background:var(--card);border:1.5px solid var(--line);padding:.85rem}
+.hbh{margin-bottom:.4rem}
+.hbt{font-size:12.5px;color:var(--ink-soft);line-height:1.45;margin-bottom:.6rem;min-height:2.6em}
+.tiers{display:none}
+.tiers button{flex:1;border:0;background:none;cursor:pointer;padding:.6rem .4rem;text-align:left;
+  border-right:1.5px solid var(--line)}
+.tiers button:last-child{border-right:0}
+.tiers button[aria-pressed="true"]{background:var(--signage)}
+.tiers .t{display:block;font:600 9px/1 "IBM Plex Mono";letter-spacing:.12em;color:var(--slate)}
+.tiers .n{display:block;font:700 15px/1.2 "Barlow Condensed";color:var(--ink);margin-top:.2rem}
+.tiers button[aria-pressed="true"] .t{color:var(--barrier)}
+.tiers button[aria-pressed="true"] .n{color:#fff}
+
+.slip{background:var(--slip);padding:1.1rem 1.1rem 1.5rem;margin:1.2rem 0;box-shadow:0 1px 0 var(--line);
   clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),
     94% 100%,88% calc(100% - 9px),82% 100%,76% calc(100% - 9px),70% 100%,64% calc(100% - 9px),
     58% 100%,52% calc(100% - 9px),46% 100%,40% calc(100% - 9px),34% 100%,28% calc(100% - 9px),
-    22% 100%,16% calc(100% - 9px),10% 100%,4% calc(100% - 9px),0 100%);
-}
+    22% 100%,16% calc(100% - 9px),10% 100%,4% calc(100% - 9px),0 100%)}
 .slip .store{font:600 12px/1 "IBM Plex Mono";letter-spacing:.12em;color:var(--slate);text-align:center}
 .slip .amt{font:700 44px/1 "Barlow Condensed";text-align:center;margin:.5rem 0 .1rem}
 .slip .meta{font:400 11px/1.5 "IBM Plex Mono";color:var(--slate);text-align:center}
 .slip .rule{border-top:1.5px dashed var(--line);margin:.9rem 0}
 .slip .code{font:600 26px/1 "IBM Plex Mono";letter-spacing:.22em;text-align:center;color:var(--signage)}
 #qr{display:flex;justify-content:center;margin:.9rem 0 .3rem}
-#qr img,#qr canvas{display:block}
 
-/* balance */
-.bal{background:var(--signage);color:#fff;padding:1.1rem}
-.bal .n{font:700 42px/1 "Barlow Condensed";color:var(--barrier)}
-.bal .k{font:400 11px/1 "IBM Plex Mono";letter-spacing:.12em;color:#BFD0E6;margin-top:.3rem}
-.track{height:8px;background:#0F3059;margin-top:.9rem}
-.track i{display:block;height:100%;background:var(--barrier);transition:width .45s cubic-bezier(.4,0,.2,1)}
-.track-k{font:400 10px/1 "IBM Plex Mono";color:#8FA9C8;margin-top:.4rem}
+.rows{margin:1rem 0}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:.8rem;
+  padding:.55rem 0;border-bottom:1px solid var(--line);font-size:14px}
+.row b{font-weight:600;display:block}
+.row .sub{color:var(--slate);font:400 10px/1.5 "IBM Plex Mono"}
+.row .v{text-align:right;white-space:nowrap}
+.pill{display:inline-block;padding:.12rem .38rem;font:600 8.5px/1.5 "IBM Plex Mono";letter-spacing:.08em;margin-top:.2rem}
+.pill.t2{background:#DCEAD9;color:var(--good)}
+.pill.t3{background:#FBF0D8;color:#7A5200}
 
-.rows{margin:1.1rem 0}
-.row{display:flex;justify-content:space-between;gap:1rem;padding:.55rem 0;border-bottom:1px solid var(--line);font-size:14px}
-.row b{font-weight:600}
-.row span{color:var(--slate);font:400 12px/1.5 "IBM Plex Mono"}
+.drop{display:block;border:1.5px dashed var(--line);background:var(--card);padding:1.3rem 1rem;
+  text-align:center;cursor:pointer}
+.drop:hover{border-color:var(--signage)}
+.drop .big{font:700 17px/1.2 "Barlow Condensed";display:block;margin-bottom:.25rem}
+.drop .sm2{font:400 12px/1.4 "IBM Plex Sans";color:var(--slate)}
+#shot{display:none}
+.preview{margin-top:.9rem;display:flex;gap:.8rem;align-items:flex-start}
+.preview img{width:92px;border:1.5px solid var(--line);display:block}
+.preview .side{flex:1}
 
-.queue{background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--barrier);padding:.85rem;margin-bottom:.7rem}
-.queue.done{border-left-color:#1F6B3B;opacity:.55}
+.exitbox{background:var(--good);color:#fff;padding:1rem;margin-top:1rem}
+.exitbox b{font:700 21px/1.1 "Barlow Condensed";display:block}
+.exitbox span{font-size:13px;color:#D6E8DA;display:block;margin-top:.3rem;line-height:1.5}
+
+.queue{background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--barrier);
+  padding:.85rem;margin-bottom:.7rem;overflow:hidden}
+.queue.done{border-left-color:var(--good);opacity:.55}
 .queue .plate{font:700 21px/1 "Barlow Condensed";letter-spacing:.05em}
 .queue .det{font:400 11px/1.6 "IBM Plex Mono";color:var(--slate);margin-top:.25rem}
+.queue .acts{display:flex;gap:.5rem;margin-top:.6rem}
+.queue img.thumb{width:64px;border:1.5px solid var(--line);float:right;margin-left:.7rem}
 
-.empty{border:1.5px dashed var(--line);padding:1.6rem 1rem;text-align:center;color:var(--slate);font-size:14px}
+.empty{border:1.5px dashed var(--line);padding:1.5rem 1rem;text-align:center;color:var(--slate);font-size:14px}
 .note{background:#E6E8E3;border-left:5px solid var(--alert);padding:.8rem;font-size:13px;color:var(--ink-soft);margin:1.2rem 0}
 .note b{color:var(--alert);font:600 10px/1 "IBM Plex Mono";letter-spacing:.12em;display:block;margin-bottom:.35rem}
-.demo-flag{background:#FBF0D8;border:1.5px solid var(--barrier);border-left:6px solid var(--barrier);
-  padding:.75rem .85rem;margin:1.1rem 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
-.demo-flag b{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:#7A5200;margin-bottom:.35rem}
 .err{color:var(--alert);font-size:13px;margin-top:.5rem;min-height:1.1em}
-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);font:400 10px/1.7 "IBM Plex Mono";color:var(--slate)}
+.sechd{font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;margin:1.4rem 0 .6rem}
+footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
+  font:400 10px/1.7 "IBM Plex Mono";color:var(--slate)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -119,115 +163,127 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);font:40
 <div class="wrap">
   <div class="demo-flag">
     <b>DEMO DATA</b>
-    The shops, amounts and plates below are sample data, put there so the flow can be shown without typing.
-    They are not test results. No shop or shopper has used this yet.
+    The parking session, shops and amounts below are sample data, put there so the flow can be shown
+    without parking a car. They are not test results. No shop or shopper has used this yet.
   </div>
 
   <nav role="tablist">
-    <button role="tab" id="t-merchant" aria-selected="true" onclick="go('merchant')">SHOP</button>
-    <button role="tab" id="t-shopper" aria-selected="false" onclick="go('shopper')">SHOPPER</button>
+    <button role="tab" id="t-shopper" aria-selected="true" onclick="go('shopper')">DRIVER</button>
+    <button role="tab" id="t-merchant" aria-selected="false" onclick="go('merchant')">SHOP</button>
     <button role="tab" id="t-desk" aria-selected="false" onclick="go('desk')">OUR DESK</button>
   </nav>
 
+  <!-- DRIVER -->
+  <section id="v-shopper">
+    <h2>You scanned your parking ticket</h2>
+    <p class="lede">This is what the QR already printed on the ticket opens. The white card is the mall's. The blue band and everything under it is the layer we add.</p>
+
+    <div class="mall">
+      <div class="brand">FUTURE PARK &amp; ZPELL</div>
+      <div class="th">บัตรจอดรถยนต์ · Parking Ticket</div>
+      <hr>
+      <div class="kv"><span>Ticket</span><b id="k-tkt">1526082916540460</b></div>
+      <div class="kv"><span>Entered</span><b id="k-in">14:54</b></div>
+      <div class="kv"><span>Now</span><b id="k-now">20:14</b></div>
+      <div class="kv"><span>Parked</span><b id="k-dur">5h 20m</b></div>
+      <hr>
+      <div class="kv"><span>Free allowance</span><b id="k-free">4h 00m</b></div>
+      <div class="kv"><span>Chargeable</span><b id="k-chg">1h 20m</b></div>
+      <div class="due">
+        <span class="l">AMOUNT DUE</span>
+        <span><span class="n" id="k-due">฿60</span><span class="was" id="k-was" hidden></span></span>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="hd"><b>SlipGo</b><span id="l-tag">ADDED BY THE MALL</span></div>
+      <div class="msg" id="l-msg">Add today's receipts and your parking fee drops. ฿500 of spending covers two extra hours.</div>
+      <div class="track"><i id="s-bar" style="width:0%"></i></div>
+      <div class="track-k" id="s-gap">฿500 to go</div>
+    </div>
+
+    <div class="addhd">ADD A RECEIPT</div>
+
+    <label class="drop" for="shot">
+      <span class="big">Scan or upload your receipt</span>
+      <span class="sm2">Photograph the slip the shop gave you</span>
+    </label>
+    <input type="file" id="shot" accept="image/*" capture="environment" onchange="picked(event)">
+    <div id="prev"></div>
+
+    <details class="manual">
+      <summary>Type the code instead</summary>
+      <div style="padding:.7rem 0 0">
+        <input type="text" id="code" maxlength="6" autocapitalize="characters" placeholder="ABC123">
+        <button class="go" style="margin-top:.55rem" onclick="claim()">Add instantly</button>
+      </div>
+    </details>
+
+    <div class="err" id="s-err"></div>
+    <div class="rows" id="s-rows"></div>
+    <div id="exit-out"></div>
+
+    <button class="ghost" onclick="resetShopper()">START A NEW VISIT</button>
+  </section>
+
   <!-- MERCHANT -->
-  <section id="v-merchant">
+  <section id="v-merchant" hidden>
     <h2>Issue a code</h2>
-    <p class="lede">Type the sale amount. The shopper scans what comes back. Nothing to install, no change to your till.</p>
+    <p class="lede">Tier 2. Staff type the sale amount, the shopper scans what comes back. No POS change, no hardware.</p>
     <div class="field">
       <label for="store">Shop name</label>
-      <input id="store" placeholder="e.g. Kanom Thai, G floor">
+      <input type="text" id="store" placeholder="e.g. Kanom Thai, G floor">
     </div>
     <div class="field">
       <label for="amt">Amount (baht)</label>
-      <input id="amt" type="number" inputmode="numeric" min="1" placeholder="0">
+      <input type="number" id="amt" inputmode="numeric" min="1" placeholder="0">
     </div>
     <button class="go" onclick="issue()">Issue code</button>
     <div class="err" id="m-err"></div>
     <div id="slip-out"></div>
   </section>
 
-  <!-- SHOPPER -->
-  <section id="v-shopper" hidden>
-    <h2>Your parking</h2>
-    <p class="lede">Enter the code from your receipt. Spend ฿500 today and your parking is handled before you reach the barrier.</p>
-
-    <div class="bal">
-      <div class="n" id="s-total">฿0</div>
-      <div class="k">SPENT TODAY</div>
-      <div class="track"><i id="s-bar" style="width:0%"></i></div>
-      <div class="track-k" id="s-gap">฿500 to go</div>
-    </div>
-
-    <div class="field" style="margin-top:1.2rem">
-      <label for="code">Code from receipt</label>
-      <input id="code" maxlength="6" autocapitalize="characters" placeholder="ABC123">
-    </div>
-    <button class="go" onclick="claim()">Add to my parking</button>
-    <div class="err" id="s-err"></div>
-
-    <div class="rows" id="s-rows"></div>
-
-    <div id="s-redeem" hidden>
-      <div class="field">
-        <label for="plate">Plate number</label>
-        <input id="plate" placeholder="กข 1234 กรุงเทพ">
-      </div>
-      <button class="go amber" onclick="redeem()">Redeem parking</button>
-    </div>
-
-    <button class="ghost" onclick="resetShopper()">START A NEW VISIT</button>
-  </section>
-
   <!-- DESK -->
   <section id="v-desk" hidden>
-    <h2>Redemptions to apply</h2>
-    <p class="lede">Week 12 runs by hand. A shopper redeems here, someone on the team walks to the counter and applies it, then marks it done. We measure the behaviour, not the integration.</p>
+    <h2>Our desk</h2>
+    <p class="lede">Week 12 runs by hand. Receipt photos need a person to check them. Tier 2 codes do not.</p>
+
+    <div class="sechd" style="color:var(--alert)">RECEIPTS AWAITING APPROVAL</div>
+    <div id="d-pend"></div>
+
+    <div class="sechd" style="color:var(--signage)">PARKING TO APPLY AT THE COUNTER</div>
     <div id="d-list"></div>
+
     <div class="note">
-      <b>WHAT THIS MEASURES</b>
-      Scan rate, completion rate, repeat use and time saved — with no access to any tenant POS or parking system. Nothing here touches a real barrier.
+      <b>WHY TWO QUEUES</b>
+      A Tier 2 code is issued by the shop, so it verifies itself. A Tier 3 photo cannot: we cannot tell a real
+      receipt from a reused one without looking. That gap is the argument for getting shops onto Tier 2.
     </div>
+
     <button class="ghost" onclick="loadDemo()">RELOAD DEMO DATA</button>
     <button class="ghost" onclick="clearAll()">CLEAR EVERYTHING</button>
   </section>
 
   <footer>
     SlipGo prototype · DES:324 · SIIT, Thammasat University<br>
-    Data is saved on this device only. Use one phone for the whole flow. Do not enter a real plate number.
+    Saved on this device only. Use one phone or one laptop for the whole flow. Do not enter a real plate number.
   </footer>
 </div>
 
 <script>
-const THRESHOLD = 500;
-const KEY = "slipgo:test:v1";
-let db = { issued: [], claimed: [], redemptions: [] };
+const THRESHOLD = 500;      // spend that earns extra free hours
+const BONUS_MIN = 120;      // two extra hours
+const RATE = 30;            // baht per chargeable hour, rounded up
+const KEY = "slipgo:test:v3";
 
-// Sample data so the flow can be shown without typing anything in.
-// Clearly labelled on screen as DEMO. These are not test results.
-const DEMO = {
-  issued: [
-    { code:"K7M2QX", store:"Kanom Thai · G floor",      amt:180, at:"14:12" },
-    { code:"P4NVR9", store:"Amazon Coffee · 1st floor",  amt:145, at:"14:31" },
-    { code:"T8HJC3", store:"Uniqlo · 2nd floor",         amt:790, at:"15:02" },
-    { code:"W2LDF6", store:"Boots · G floor",            amt:265, at:"15:20" },
-    { code:"R5YBN8", store:"MK Restaurant · 3rd floor",  amt:620, at:"18:44" }
-  ],
-  claimed: [
-    { code:"K7M2QX", store:"Kanom Thai · G floor",      amt:180, at:"14:12" },
-    { code:"P4NVR9", store:"Amazon Coffee · 1st floor",  amt:145, at:"14:31" }
-  ],
-  redemptions: [
-    { plate:"DEMO 1234", total:640, stores:3, at:"13:05", done:true  },
-    { plate:"DEMO 8891", total:515, stores:2, at:"15:47", done:false }
-  ]
-};
-function loadDemo(){
-  db = JSON.parse(JSON.stringify(DEMO));
-  $("slip-out").innerHTML = "";
-  save();
-}
+let db = { session:null, issued:[], claimed:[], pending:[], redemptions:[] };
 
-// Works both inside Claude artifacts and on a plain web host.
+const $ = id => document.getElementById(id);
+const baht = n => "฿" + Number(n).toLocaleString("en-US");
+const now = () => new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+const esc = s => String(s).replace(/[<>&"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+const hm = m => Math.floor(m/60) + "h " + String(m%60).padStart(2,"0") + "m";
+
 const store = {
   async get(k){
     if(window.storage) return await window.storage.get(k);
@@ -237,68 +293,89 @@ const store = {
   },
   async set(k,v){
     if(window.storage) return await window.storage.set(k,v);
-    localStorage.setItem(k,v);
-    return { key:k, value:v };
+    localStorage.setItem(k,v); return { key:k, value:v };
   },
   async del(k){
     if(window.storage) return await window.storage.delete(k);
-    localStorage.removeItem(k);
-    return { key:k, deleted:true };
+    localStorage.removeItem(k); return { key:k, deleted:true };
   }
 };
-const $ = id => document.getElementById(id);
-const baht = n => "฿" + Number(n).toLocaleString("en-US");
-const now = () => new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+
+const DEMO = {
+  session: { ticket:"1526082916540460", inAt:"14:54", nowAt:"20:14", parkedMin:320, freeMin:240 },
+  issued: [
+    { code:"K7M2QX", store:"Kanom Thai · G floor",     amt:180, at:"14:12" },
+    { code:"P4NVR9", store:"Amazon Coffee · 1st floor", amt:145, at:"14:31" },
+    { code:"T8HJC3", store:"Uniqlo · 2nd floor",        amt:790, at:"15:02" },
+    { code:"W2LDF6", store:"Boots · G floor",           amt:265, at:"15:20" },
+    { code:"R5YBN8", store:"MK Restaurant · 3rd floor", amt:620, at:"18:44" }
+  ],
+  claimed: [
+    { code:"K7M2QX", store:"Kanom Thai · G floor",     amt:180, at:"14:12", tier:2 },
+    { code:"P4NVR9", store:"Amazon Coffee · 1st floor", amt:145, at:"14:31", tier:2 }
+  ],
+  pending: [],
+  redemptions: [ { plate:"DEMO 1234", total:640, at:"13:05", done:true } ]
+};
 
 async function load(){
   try{
     const r = await store.get(KEY);
-    if(r && r.value) db = JSON.parse(r.value);
-    else db = JSON.parse(JSON.stringify(DEMO));
+    db = r && r.value ? JSON.parse(r.value) : JSON.parse(JSON.stringify(DEMO));
   }catch(e){ db = JSON.parse(JSON.stringify(DEMO)); }
+  if(!db.session) db.session = JSON.parse(JSON.stringify(DEMO.session));
   render();
 }
 async function save(){
-  try{ await store.set(KEY, JSON.stringify(db)); }
-  catch(e){ console.error("save failed", e); }
+  try{ await store.set(KEY, JSON.stringify(db)); }catch(e){ console.error(e); }
   render();
+}
+function loadDemo(){
+  db = JSON.parse(JSON.stringify(DEMO));
+  $("slip-out").innerHTML = ""; $("prev").innerHTML = "";
+  save();
+}
+async function clearAll(){
+  db = { session:JSON.parse(JSON.stringify(DEMO.session)), issued:[], claimed:[], pending:[], redemptions:[] };
+  $("slip-out").innerHTML = ""; $("prev").innerHTML = "";
+  try{ await store.del(KEY); }catch(e){}
+  save();
 }
 
 function go(v){
-  ["merchant","shopper","desk"].forEach(n=>{
+  ["shopper","merchant","desk"].forEach(n=>{
     $("v-"+n).hidden = n !== v;
     $("t-"+n).setAttribute("aria-selected", n===v);
   });
   render();
 }
+const total = () => db.claimed.reduce((s,t)=>s+t.amt, 0);
+function bonusMin(){ return total() >= THRESHOLD ? BONUS_MIN : 0; }
+function fee(extra){
+  const s = db.session;
+  const charge = Math.max(0, s.parkedMin - s.freeMin - (extra||0));
+  return Math.ceil(charge/60) * RATE;
+}
 
 function newCode(){
   const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for(let i=0;i<6;i++) s += a[Math.floor(Math.random()*a.length)];
+  let s = ""; for(let i=0;i<6;i++) s += a[Math.floor(Math.random()*a.length)];
   return s;
 }
 
 function issue(){
-  const store = $("store").value.trim();
-  const amt = parseInt($("amt").value, 10);
+  const st = $("store").value.trim(), amt = parseInt($("amt").value,10);
   $("m-err").textContent = "";
-  if(!store){ $("m-err").textContent = "Enter the shop name."; return; }
+  if(!st){ $("m-err").textContent = "Enter the shop name."; return; }
   if(!amt || amt < 1){ $("m-err").textContent = "Enter an amount above zero."; return; }
-
-  const t = { code:newCode(), store, amt, at:now() };
-  db.issued.push(t);
-  save();
-
+  const t = { code:newCode(), store:st, amt, at:now() };
+  db.issued.push(t); save();
   $("slip-out").innerHTML =
-    '<div class="slip">' +
-      '<div class="store">'+esc(store)+'</div>' +
-      '<div class="amt">'+baht(amt)+'</div>' +
-      '<div class="meta">'+t.at+' · single use · valid today</div>' +
-      '<div class="rule"></div>' +
-      '<div id="qr"></div>' +
-      '<div class="code">'+t.code+'</div>' +
-    '</div>';
+    '<div class="slip"><div class="store">'+esc(st)+'</div>' +
+    '<div class="amt">'+baht(amt)+'</div>' +
+    '<div class="meta">'+t.at+' · single use · valid today</div>' +
+    '<div class="rule"></div><div id="qr"></div>' +
+    '<div class="code">'+t.code+'</div></div>';
   new QRCode($("qr"), { text:t.code, width:132, height:132, colorDark:"#17457F", colorLight:"#FBFAF7" });
   $("amt").value = "";
 }
@@ -307,67 +384,140 @@ function claim(){
   const c = $("code").value.trim().toUpperCase();
   $("s-err").textContent = "";
   if(c.length !== 6){ $("s-err").textContent = "Codes are six characters."; return; }
-
   const i = db.issued.findIndex(t => t.code === c);
   if(i === -1){ $("s-err").textContent = "No code like that. Check the receipt."; return; }
   if(db.claimed.some(t => t.code === c)){ $("s-err").textContent = "That code was already used."; return; }
-
-  db.claimed.push(db.issued[i]);
-  $("code").value = "";
-  save();
+  db.claimed.push(Object.assign({}, db.issued[i], { tier:2 }));
+  $("code").value = ""; save();
 }
 
-function redeem(){
-  const plate = $("plate").value.trim();
-  if(!plate){ $("s-err").textContent = "Enter the plate on your car."; return; }
-  db.redemptions.push({
-    plate, total: total(), stores: db.claimed.length, at: now(), done: false
+function picked(ev){
+  const f = ev.target.files && ev.target.files[0];
+  if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => shrink(fr.result, small => {
+    $("prev").innerHTML =
+      '<div class="preview"><img src="'+small+'" alt="The receipt you uploaded">' +
+      '<div class="side">' +
+      '<label for="p-code">SlipGo code printed on the slip</label>' +
+      '<input type="text" id="p-code" maxlength="6" autocapitalize="characters" placeholder="ABC123">' +
+      '<button class="go" style="margin-top:.55rem" onclick="submitWithCode()">Add to my parking</button>' +
+      '<div class="nocode">No code on this slip? ' +
+      '<a href="#" onclick="noCode();return false;">Send it to be checked by hand</a></div>' +
+      '</div></div>';
+    $("prev").dataset.img = small;
   });
-  db.claimed = [];
-  $("plate").value = "";
+  fr.readAsDataURL(f);
+}
+function shrink(dataUrl, cb){
+  const im = new Image();
+  im.onload = () => {
+    const max = 300, sc = Math.min(1, max/Math.max(im.width, im.height));
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(im.width*sc); cv.height = Math.round(im.height*sc);
+    cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
+    cb(cv.toDataURL("image/jpeg", 0.55));
+  };
+  im.onerror = () => cb(dataUrl);
+  im.src = dataUrl;
+}
+function submitWithCode(){
+  const el = $("p-code"), c = el ? el.value.trim().toUpperCase() : "";
+  $("s-err").textContent = "";
+  if(c.length !== 6){ $("s-err").textContent = "The code on the slip is six characters."; return; }
+  const i = db.issued.findIndex(t => t.code === c);
+  if(i === -1){ $("s-err").textContent = "That code is not from a joined shop. Send it to be checked instead."; return; }
+  if(db.claimed.some(t => t.code === c)){ $("s-err").textContent = "That receipt was already used."; return; }
+  db.claimed.push(Object.assign({}, db.issued[i], { tier:2 }));
+  $("prev").innerHTML = ""; $("shot").value = "";
   save();
-  go("desk");
 }
 
-const total = () => db.claimed.reduce((s,t)=>s+t.amt, 0);
+function noCode(){
+  const amt = prompt("Total shown on the receipt (baht)");
+  const n = parseInt(amt, 10);
+  if(!n || n < 1) return;
+  db.pending.push({ id:Date.now(), amt:n, at:now(), img:$("prev").dataset.img || null, state:"pending" });
+  $("prev").innerHTML = ""; $("shot").value = "";
+  save();
+}
 
+function approve(i){
+  const p = db.pending[i];
+  p.state = "approved";
+  db.claimed.push({ code:"PHOTO"+p.id, store:"Receipt photo · approved", amt:p.amt, at:p.at, tier:3 });
+  save();
+}
+function reject(i){ db.pending[i].state = "rejected"; save(); }
+
+function exitNow(){
+  db.redemptions.push({ plate:"TICKET "+db.session.ticket.slice(-6), total:total(), at:now(), done:false });
+  db.claimed = []; db.pending = [];
+  save(); go("desk");
+}
 function markDone(i){ db.redemptions[i].done = true; save(); }
-function resetShopper(){ db.claimed = []; save(); }
-async function clearAll(){
-  db = { issued:[], claimed:[], redemptions:[] };
-  await save();
-  $("slip-out").innerHTML = "";
-}
-
-function esc(s){ return s.replace(/[<>&"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c])); }
+function resetShopper(){ db.claimed = []; db.pending = []; save(); }
 
 function render(){
-  const t = total();
-  $("s-total").textContent = baht(t);
-  const pct = Math.min(100, (t/THRESHOLD)*100);
-  $("s-bar").style.width = pct + "%";
-  $("s-gap").textContent = t >= THRESHOLD
-    ? "Threshold reached — redeem below"
-    : baht(THRESHOLD - t) + " to go";
-  $("s-redeem").hidden = t < THRESHOLD;
+  const s = db.session, t = total(), bonus = bonusMin();
+  const base = fee(0), due = fee(bonus);
 
-  $("s-rows").innerHTML = db.claimed.length
-    ? db.claimed.map(x =>
-        '<div class="row"><b>'+esc(x.store)+'</b><span>'+baht(x.amt)+' · '+x.at+'</span></div>').join("")
-    : '<div class="empty">Nothing added yet. Enter a code from a receipt.</div>';
+  $("k-tkt").textContent = s.ticket;
+  $("k-in").textContent = s.inAt;
+  $("k-now").textContent = s.nowAt;
+  $("k-dur").textContent = hm(s.parkedMin);
+  $("k-free").textContent = hm(s.freeMin + bonus) + (bonus ? "  (+2h from SlipGo)" : "");
+  $("k-chg").textContent = hm(Math.max(0, s.parkedMin - s.freeMin - bonus));
 
-  const open = db.redemptions.filter(r=>!r.done).length;
+  const dueEl = $("k-due"), wasEl = $("k-was");
+  dueEl.textContent = due === 0 ? "฿0" : baht(due);
+  dueEl.className = "n" + (due === 0 ? " free" : "");
+  if(bonus && base > due){ wasEl.hidden = false; wasEl.textContent = baht(base); }
+  else wasEl.hidden = true;
+
+  $("s-bar").style.width = Math.min(100,(t/THRESHOLD)*100) + "%";
+  const wait = db.pending.filter(p=>p.state==="pending").reduce((a,p)=>a+p.amt,0);
+  if(t >= THRESHOLD){
+    $("l-msg").textContent = "฿" + t.toLocaleString("en-US") + " of spending confirmed. Two extra free hours applied.";
+    $("s-gap").textContent = "Threshold reached";
+  }else{
+    $("l-msg").textContent = "Add today's receipts and your parking fee drops. ฿500 of spending covers two extra hours.";
+    $("s-gap").textContent = baht(THRESHOLD-t) + " to go" + (wait ? "  ·  " + baht(wait) + " waiting on approval" : "");
+  }
+
+  const lines = db.claimed.map(x =>
+    '<div class="row"><div><b>'+esc(x.store)+'</b>' +
+    '<span class="pill '+(x.tier===3?"t3":"t2")+'">'+(x.tier===3?"TIER 3 APPROVED":"TIER 2 VERIFIED")+'</span></div>' +
+    '<div class="v">'+baht(x.amt)+'<div class="sub">'+x.at+'</div></div></div>'
+  ).concat(db.pending.filter(p=>p.state==="pending").map(p =>
+    '<div class="row"><div><b>Receipt photo</b><span class="pill t3">TIER 3 · WAITING</span></div>' +
+    '<div class="v" style="color:var(--slate)">'+baht(p.amt)+'<div class="sub">approve it at OUR DESK</div></div></div>'
+  ));
+  $("s-rows").innerHTML = lines.length ? lines.join("")
+    : '<div class="empty">No receipts added yet.</div>';
+
+  $("exit-out").innerHTML = due === 0
+    ? '<div class="exitbox"><b>Nothing to pay</b><span>Drive to the exit. The plate is already linked to this ticket, ' +
+      'so the barrier opens without stopping.</span></div>' +
+      '<button class="go amber" style="margin-top:.7rem" onclick="exitNow()">Go to the exit</button>'
+    : '';
+
+  const pend = db.pending.map((p,i) => p.state !== "pending" ? "" :
+    '<div class="queue">' + (p.img ? '<img class="thumb" src="'+p.img+'" alt="Submitted receipt">' : '') +
+    '<div class="plate">'+baht(p.amt)+'</div>' +
+    '<div class="det">Receipt photo · '+p.at+' · unverified</div>' +
+    '<div class="acts"><button class="sm ok" onclick="approve('+i+')">APPROVE</button>' +
+    '<button class="sm no" onclick="reject('+i+')">REJECT</button></div></div>').join("");
+  $("d-pend").innerHTML = pend || '<div class="empty">Nothing waiting.</div>';
+
   $("d-list").innerHTML = db.redemptions.length
     ? db.redemptions.map((r,i) =>
-        '<div class="queue'+(r.done?" done":"")+'">' +
-          '<div class="plate">'+esc(r.plate)+'</div>' +
-          '<div class="det">'+baht(r.total)+' across '+r.stores+' shop'+(r.stores===1?"":"s")+' · '+r.at+'</div>' +
-          (r.done ? '<div class="det">Applied</div>'
-                  : '<button class="ghost" onclick="markDone('+i+')">MARK APPLIED</button>') +
+        '<div class="queue'+(r.done?" done":"")+'"><div class="plate">'+esc(r.plate)+'</div>' +
+        '<div class="det">'+baht(r.total)+' of receipts · '+r.at+'</div>' +
+        (r.done ? '<div class="det">Applied at the counter</div>'
+                : '<div class="acts"><button class="sm" onclick="markDone('+i+')">MARK APPLIED</button></div>') +
         '</div>').join("")
-    : '<div class="empty">No redemptions yet.</div>';
-
-  document.title = open ? "("+open+") SlipGo — concierge test" : "SlipGo — concierge test";
+    : '<div class="empty">No exits yet.</div>';
 }
 
 load();
