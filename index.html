@@ -409,14 +409,29 @@ function handleImage(file){
   $("s-err").textContent = "";
   $("prev").innerHTML = '<div class="reading">Reading the slip\u2026</div>';
   const fr = new FileReader();
-  fr.onload = () => shrink(fr.result, (small, wide) => {
-    $("prev").dataset.img = small;
-    const found = readCode(wide);
-    if(found){ addByCode(found, true); }
-    else { askForCode(small); }
-  });
-  fr.onerror = () => { $("prev").innerHTML = ""; $("s-err").textContent = "Could not read that image."; };
+  fr.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const small = thumb(img);
+      $("prev").dataset.img = small;
+      const r = readCode(img);
+      if(r.code) addByCode(r.code, true);
+      else askForCode(small, r.err);
+    };
+    img.onerror = () => { $("prev").innerHTML = ""; $("s-err").textContent = "Could not open that image."; };
+    img.src = fr.result;
+  };
+  fr.onerror = () => { $("prev").innerHTML = ""; $("s-err").textContent = "Could not read that file."; };
   fr.readAsDataURL(file);
+}
+
+function thumb(img){
+  const max = 300, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const sc = Math.min(1, max/Math.max(iw, ih));
+  const cv = document.createElement("canvas");
+  cv.width = Math.round(iw*sc); cv.height = Math.round(ih*sc);
+  cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+  return cv.toDataURL("image/jpeg", 0.6);
 }
 
 // Paste an image from the clipboard, anywhere on the page.
@@ -448,19 +463,38 @@ document.addEventListener("paste", e => {
   });
 })();
 
-// Look for a SlipGo code on the photo: first any QR, then the printed text pattern.
-function readCode(canvas){
+// Look for a SlipGo code on the photo. Try a few sizes, since a QR on a slip is small.
+function readCode(img){
+  if(!window.jsQR){ return { err:"reader" }; }
+  if(!img){ return { err:"image" }; }
+
+  const sizes = [img.naturalWidth || img.width, 1600, 1100, 800];
+  for(const w of sizes){
+    if(!w) continue;
+    const hit = tryAt(img, w);
+    if(hit) return { code:hit };
+  }
+  return { err:"nocode" };
+}
+
+function tryAt(img, targetW){
   try{
-    const ctx = canvas.getContext("2d");
-    const d = ctx.getImageData(0,0,canvas.width,canvas.height);
-    if(window.jsQR){
-      const q = jsQR(d.data, d.width, d.height);
-      if(q && q.data){
-        const m = String(q.data).toUpperCase().match(/[A-Z0-9]{6}/);
-        if(m && db.issued.some(t => t.code === m[0])) return m[0];
-      }
+    const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+    if(!iw || !ih) return null;
+    const sc = targetW / iw;
+    const cv = document.createElement("canvas");
+    cv.width = Math.max(1, Math.round(iw*sc));
+    cv.height = Math.max(1, Math.round(ih*sc));
+    if(cv.width > 4000 || cv.height > 4000) return null;
+    const ctx = cv.getContext("2d", { willReadFrequently:true });
+    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    const d = ctx.getImageData(0, 0, cv.width, cv.height);
+    const q = jsQR(d.data, d.width, d.height, { inversionAttempts:"attemptBoth" });
+    if(q && q.data){
+      const m = String(q.data).toUpperCase().match(/[A-Z0-9]{6}/);
+      if(m) return m[0];
     }
-  }catch(e){ /* fall through */ }
+  }catch(e){ /* try the next size */ }
   return null;
 }
 
@@ -480,35 +514,22 @@ function addByCode(c, auto){
 }
 
 // No code on the photo: offer the manual route and the by-hand route.
-function askForCode(small){
+function askForCode(small, why){
+  const msg = why === "reader"
+    ? "The code reader did not load, so we cannot check the slip automatically. Type the code, or send it to be checked."
+    : why === "image"
+    ? "We could not open that image. Type the code, or send it to be checked."
+    : "This shop has probably not joined yet. Send it to us and we will check it by hand, or type the code if you can see one.";
+  const hd = why === "nocode" ? "No SlipGo code found on this slip" : "Could not read the slip";
   $("prev").innerHTML =
     '<div class="preview"><img src="'+small+'" alt="The receipt you uploaded">' +
     '<div class="side">' +
-    '<div class="nocodehd">No SlipGo code found on this slip</div>' +
-    '<div class="nocode">This shop has probably not joined yet. Send it to us and we will check it by hand, ' +
-    'or type the code if you can see one.</div>' +
-    '<button class="go" style="margin-top:.55rem" onclick="noCode()">Send to be checked</button>' +
+    '<div class="nocodehd">'+hd+'</div>' +
+    '<div class="nocode">'+msg+'</div>' +
     '<input type="text" id="p-code" maxlength="6" autocapitalize="characters" placeholder="ABC123" style="margin-top:.5rem">' +
-    '<button class="ghost" style="margin-top:.4rem" onclick="submitWithCode()">ADD WITH THIS CODE</button>' +
+    '<button class="go" style="margin-top:.5rem" onclick="submitWithCode()">Add with this code</button>' +
+    '<button class="ghost" style="margin-top:.4rem" onclick="noCode()">SEND TO BE CHECKED BY HAND</button>' +
     '</div></div>';
-}
-
-function shrink(dataUrl, cb){
-  const im = new Image();
-  im.onload = () => {
-    const wide = document.createElement("canvas");
-    const ws = Math.min(1, 900/Math.max(im.width, im.height));
-    wide.width = Math.round(im.width*ws); wide.height = Math.round(im.height*ws);
-    wide.getContext("2d", { willReadFrequently:true }).drawImage(im, 0, 0, wide.width, wide.height);
-
-    const max = 300, sc = Math.min(1, max/Math.max(im.width, im.height));
-    const cv = document.createElement("canvas");
-    cv.width = Math.round(im.width*sc); cv.height = Math.round(im.height*sc);
-    cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
-    cb(cv.toDataURL("image/jpeg", 0.55), wide);
-  };
-  im.onerror = () => cb(dataUrl, null);
-  im.src = dataUrl;
 }
 
 function submitWithCode(){
