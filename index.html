@@ -164,8 +164,9 @@ button.sm.no{border-color:var(--alert);color:var(--alert)}
   padding:.65rem;font:600 13px/1 "IBM Plex Mono";letter-spacing:.06em;color:var(--slate);cursor:pointer}
 #pastebox:focus{outline:0;border-color:var(--signage);background:#fff;color:var(--ink)}
 .drop .pick{display:inline-block;margin-top:.6rem;font:600 10px/1 "IBM Plex Mono";letter-spacing:.1em;
-  color:var(--signage);cursor:pointer;text-decoration:underline}
-#shot{display:none}
+  color:var(--signage);cursor:pointer;text-decoration:underline;background:none;border:0;padding:.3rem}
+.drop .pick:focus-visible{outline:3px solid var(--barrier);outline-offset:2px}
+#shot{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
 .preview{margin-top:.9rem;display:flex;gap:.8rem;align-items:flex-start}
 .preview img{width:92px;border:1.5px solid var(--line);display:block}
 .preview .side{flex:1}
@@ -245,8 +246,8 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
       <span class="big">Add your receipt</span>
       <span class="sm2">Click the box below and press <kbd>&#8984;V</kbd>, drag an image in, or choose a file</span>
       <input type="text" id="pastebox" placeholder="Click here, then press &#8984;V" readonly>
-      <label class="pick" for="shot">or choose a file</label>
-      <input type="file" id="shot" accept="image/*" onchange="picked(event)">
+      <button type="button" class="pick" id="pickbtn">or choose a file</button>
+      <input type="file" id="shot" accept="image/*">
     </div>
     <div id="prev"></div>
 
@@ -431,10 +432,18 @@ function claim(){
 }
 
 function picked(ev){
-  const f = ev.target.files && ev.target.files[0];
-  if(f){ handleImage(f); return; }
+  const inp = ev && ev.target ? ev.target : $("shot");
+  const f = inp && inp.files && inp.files[0];
+  if(f){ handleImage(f); inp.value = ""; return; }
   $("s-err").textContent = "No image came through. Try choosing it from your photos instead.";
 }
+
+function wireFileInput(){
+  const inp = $("shot"), btn = $("pickbtn");
+  if(inp) inp.addEventListener("change", picked);
+  if(btn) btn.addEventListener("click", () => { if(inp){ inp.value = ""; inp.click(); } });
+}
+wireFileInput();
 
 function handleImage(file){
   $("s-err").textContent = "";
