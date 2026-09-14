@@ -310,7 +310,7 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
   </section>
 
   <footer>
-    SlipGo prototype · DES:324 · SIIT, Thammasat University · <b id="build">BUILD 7</b><br>
+    SlipGo prototype · DES:324 · SIIT, Thammasat University · <b id="build">BUILD 8</b><br>
     Saved on this device only. Use one phone or one laptop for the whole flow. Do not enter a real plate number.
   </footer>
 </div>
@@ -444,6 +444,19 @@ function claim(){
 function picked(ev){
   const f = ev.target.files && ev.target.files[0];
   if(f) handleImage(f);
+}
+
+function thumb(img){
+  try{
+    const max = 300;
+    const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+    const sc = Math.min(1, max/Math.max(iw, ih));
+    const cv = document.createElement("canvas");
+    cv.width = Math.max(1, Math.round(iw*sc));
+    cv.height = Math.max(1, Math.round(ih*sc));
+    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    return cv.toDataURL("image/jpeg", 0.6);
+  }catch(e){ return img.src || ""; }
 }
 
 function handleImage(file){
@@ -804,6 +817,6 @@ load();
     if(c){ c.hidden = false; c.textContent = "MISSING: " + bad.join(", "); }
   }
   const b = $("build");
-  if(b) b.textContent = "BUILD 7 \u00b7 " + ok.length + "/4 ready";
+  if(b) b.textContent = "BUILD 8 \u00b7 " + ok.length + "/4 ready";
 })();
 </script>
