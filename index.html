@@ -1,0 +1,374 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SlipGo — concierge test prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+:root{
+  --ink:#111721; --ink-soft:#3A4351; --slate:#6E7887; --line:#D7DBE0;
+  --page:#F1F2EF; --card:#FFFFFF; --signage:#17457F; --barrier:#E8A317; --alert:#B33A2B;
+  --slip:#FBFAF7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--page); color:var(--ink);
+  font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:4rem;
+}
+.wrap{max-width:460px;margin:0 auto;padding:0 1rem}
+
+/* masthead */
+header{background:var(--signage);color:#fff;padding:1.1rem 0 0}
+header .wrap{display:flex;align-items:baseline;gap:.6rem}
+h1{font:700 30px/1 "Barlow Condensed";margin:0;letter-spacing:.01em}
+.tag{font:600 10px/1 "IBM Plex Mono";letter-spacing:.18em;color:#BFD0E6}
+.arm{height:11px;margin-top:.9rem;
+  background:repeating-linear-gradient(115deg,var(--barrier) 0 13px,#F5F3EE 13px 26px);
+  border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+
+/* role switch */
+nav{display:flex;gap:0;margin:1.1rem 0 1.4rem;border:1.5px solid var(--ink);background:var(--card)}
+nav button{
+  flex:1;border:0;background:none;cursor:pointer;padding:.72rem .3rem;
+  font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);
+  border-right:1.5px solid var(--ink);
+}
+nav button:last-child{border-right:0}
+nav button[aria-selected="true"]{background:var(--signage);color:#fff}
+nav button:focus-visible{outline:3px solid var(--barrier);outline-offset:-3px}
+
+h2{font:700 23px/1.15 "Barlow Condensed";margin:0 0 .2rem}
+.lede{color:var(--ink-soft);font-size:14px;margin:0 0 1.2rem}
+
+label{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.13em;color:var(--slate);margin:0 0 .35rem}
+input{
+  width:100%;padding:.7rem .8rem;border:1.5px solid var(--line);background:var(--card);
+  font:500 17px/1.2 "IBM Plex Sans";color:var(--ink);border-radius:0;
+}
+input:focus{outline:0;border-color:var(--signage)}
+.field{margin-bottom:1rem}
+
+button.go{
+  width:100%;padding:.85rem;border:0;background:var(--signage);color:#fff;cursor:pointer;
+  font:700 17px/1 "Barlow Condensed";letter-spacing:.04em;
+}
+button.go:disabled{background:var(--line);color:var(--slate);cursor:not-allowed}
+button.go.amber{background:var(--barrier);color:var(--ink)}
+button.go:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button.ghost{
+  width:100%;padding:.6rem;margin-top:.5rem;background:none;border:1.5px solid var(--line);
+  cursor:pointer;font:600 11px/1 "IBM Plex Mono";letter-spacing:.1em;color:var(--slate);
+}
+
+/* the slip — the one piece of boldness */
+.slip{
+  background:var(--slip);padding:1.1rem 1.1rem 1.5rem;margin:1.2rem 0;
+  box-shadow:0 1px 0 var(--line);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),
+    94% 100%,88% calc(100% - 9px),82% 100%,76% calc(100% - 9px),70% 100%,64% calc(100% - 9px),
+    58% 100%,52% calc(100% - 9px),46% 100%,40% calc(100% - 9px),34% 100%,28% calc(100% - 9px),
+    22% 100%,16% calc(100% - 9px),10% 100%,4% calc(100% - 9px),0 100%);
+}
+.slip .store{font:600 12px/1 "IBM Plex Mono";letter-spacing:.12em;color:var(--slate);text-align:center}
+.slip .amt{font:700 44px/1 "Barlow Condensed";text-align:center;margin:.5rem 0 .1rem}
+.slip .meta{font:400 11px/1.5 "IBM Plex Mono";color:var(--slate);text-align:center}
+.slip .rule{border-top:1.5px dashed var(--line);margin:.9rem 0}
+.slip .code{font:600 26px/1 "IBM Plex Mono";letter-spacing:.22em;text-align:center;color:var(--signage)}
+#qr{display:flex;justify-content:center;margin:.9rem 0 .3rem}
+#qr img,#qr canvas{display:block}
+
+/* balance */
+.bal{background:var(--signage);color:#fff;padding:1.1rem}
+.bal .n{font:700 42px/1 "Barlow Condensed";color:var(--barrier)}
+.bal .k{font:400 11px/1 "IBM Plex Mono";letter-spacing:.12em;color:#BFD0E6;margin-top:.3rem}
+.track{height:8px;background:#0F3059;margin-top:.9rem}
+.track i{display:block;height:100%;background:var(--barrier);transition:width .45s cubic-bezier(.4,0,.2,1)}
+.track-k{font:400 10px/1 "IBM Plex Mono";color:#8FA9C8;margin-top:.4rem}
+
+.rows{margin:1.1rem 0}
+.row{display:flex;justify-content:space-between;gap:1rem;padding:.55rem 0;border-bottom:1px solid var(--line);font-size:14px}
+.row b{font-weight:600}
+.row span{color:var(--slate);font:400 12px/1.5 "IBM Plex Mono"}
+
+.queue{background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--barrier);padding:.85rem;margin-bottom:.7rem}
+.queue.done{border-left-color:#1F6B3B;opacity:.55}
+.queue .plate{font:700 21px/1 "Barlow Condensed";letter-spacing:.05em}
+.queue .det{font:400 11px/1.6 "IBM Plex Mono";color:var(--slate);margin-top:.25rem}
+
+.empty{border:1.5px dashed var(--line);padding:1.6rem 1rem;text-align:center;color:var(--slate);font-size:14px}
+.note{background:#E6E8E3;border-left:5px solid var(--alert);padding:.8rem;font-size:13px;color:var(--ink-soft);margin:1.2rem 0}
+.note b{color:var(--alert);font:600 10px/1 "IBM Plex Mono";letter-spacing:.12em;display:block;margin-bottom:.35rem}
+.demo-flag{background:#FBF0D8;border:1.5px solid var(--barrier);border-left:6px solid var(--barrier);
+  padding:.75rem .85rem;margin:1.1rem 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+.demo-flag b{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:#7A5200;margin-bottom:.35rem}
+.err{color:var(--alert);font-size:13px;margin-top:.5rem;min-height:1.1em}
+footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);font:400 10px/1.7 "IBM Plex Mono";color:var(--slate)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header>
+  <div class="wrap"><h1>SlipGo</h1><span class="tag">CONCIERGE TEST</span></div>
+  <div class="arm"></div>
+</header>
+
+<div class="wrap">
+  <div class="demo-flag">
+    <b>DEMO DATA</b>
+    The shops, amounts and plates below are sample data, put there so the flow can be shown without typing.
+    They are not test results. No shop or shopper has used this yet.
+  </div>
+
+  <nav role="tablist">
+    <button role="tab" id="t-merchant" aria-selected="true" onclick="go('merchant')">SHOP</button>
+    <button role="tab" id="t-shopper" aria-selected="false" onclick="go('shopper')">SHOPPER</button>
+    <button role="tab" id="t-desk" aria-selected="false" onclick="go('desk')">OUR DESK</button>
+  </nav>
+
+  <!-- MERCHANT -->
+  <section id="v-merchant">
+    <h2>Issue a code</h2>
+    <p class="lede">Type the sale amount. The shopper scans what comes back. Nothing to install, no change to your till.</p>
+    <div class="field">
+      <label for="store">Shop name</label>
+      <input id="store" placeholder="e.g. Kanom Thai, G floor">
+    </div>
+    <div class="field">
+      <label for="amt">Amount (baht)</label>
+      <input id="amt" type="number" inputmode="numeric" min="1" placeholder="0">
+    </div>
+    <button class="go" onclick="issue()">Issue code</button>
+    <div class="err" id="m-err"></div>
+    <div id="slip-out"></div>
+  </section>
+
+  <!-- SHOPPER -->
+  <section id="v-shopper" hidden>
+    <h2>Your parking</h2>
+    <p class="lede">Enter the code from your receipt. Spend ฿500 today and your parking is handled before you reach the barrier.</p>
+
+    <div class="bal">
+      <div class="n" id="s-total">฿0</div>
+      <div class="k">SPENT TODAY</div>
+      <div class="track"><i id="s-bar" style="width:0%"></i></div>
+      <div class="track-k" id="s-gap">฿500 to go</div>
+    </div>
+
+    <div class="field" style="margin-top:1.2rem">
+      <label for="code">Code from receipt</label>
+      <input id="code" maxlength="6" autocapitalize="characters" placeholder="ABC123">
+    </div>
+    <button class="go" onclick="claim()">Add to my parking</button>
+    <div class="err" id="s-err"></div>
+
+    <div class="rows" id="s-rows"></div>
+
+    <div id="s-redeem" hidden>
+      <div class="field">
+        <label for="plate">Plate number</label>
+        <input id="plate" placeholder="กข 1234 กรุงเทพ">
+      </div>
+      <button class="go amber" onclick="redeem()">Redeem parking</button>
+    </div>
+
+    <button class="ghost" onclick="resetShopper()">START A NEW VISIT</button>
+  </section>
+
+  <!-- DESK -->
+  <section id="v-desk" hidden>
+    <h2>Redemptions to apply</h2>
+    <p class="lede">Week 12 runs by hand. A shopper redeems here, someone on the team walks to the counter and applies it, then marks it done. We measure the behaviour, not the integration.</p>
+    <div id="d-list"></div>
+    <div class="note">
+      <b>WHAT THIS MEASURES</b>
+      Scan rate, completion rate, repeat use and time saved — with no access to any tenant POS or parking system. Nothing here touches a real barrier.
+    </div>
+    <button class="ghost" onclick="loadDemo()">RELOAD DEMO DATA</button>
+    <button class="ghost" onclick="clearAll()">CLEAR EVERYTHING</button>
+  </section>
+
+  <footer>
+    SlipGo prototype · DES:324 · SIIT, Thammasat University<br>
+    Data is saved on this device only. Use one phone for the whole flow. Do not enter a real plate number.
+  </footer>
+</div>
+
+<script>
+const THRESHOLD = 500;
+const KEY = "slipgo:test:v1";
+let db = { issued: [], claimed: [], redemptions: [] };
+
+// Sample data so the flow can be shown without typing anything in.
+// Clearly labelled on screen as DEMO. These are not test results.
+const DEMO = {
+  issued: [
+    { code:"K7M2QX", store:"Kanom Thai · G floor",      amt:180, at:"14:12" },
+    { code:"P4NVR9", store:"Amazon Coffee · 1st floor",  amt:145, at:"14:31" },
+    { code:"T8HJC3", store:"Uniqlo · 2nd floor",         amt:790, at:"15:02" },
+    { code:"W2LDF6", store:"Boots · G floor",            amt:265, at:"15:20" },
+    { code:"R5YBN8", store:"MK Restaurant · 3rd floor",  amt:620, at:"18:44" }
+  ],
+  claimed: [
+    { code:"K7M2QX", store:"Kanom Thai · G floor",      amt:180, at:"14:12" },
+    { code:"P4NVR9", store:"Amazon Coffee · 1st floor",  amt:145, at:"14:31" }
+  ],
+  redemptions: [
+    { plate:"DEMO 1234", total:640, stores:3, at:"13:05", done:true  },
+    { plate:"DEMO 8891", total:515, stores:2, at:"15:47", done:false }
+  ]
+};
+function loadDemo(){
+  db = JSON.parse(JSON.stringify(DEMO));
+  $("slip-out").innerHTML = "";
+  save();
+}
+
+// Works both inside Claude artifacts and on a plain web host.
+const store = {
+  async get(k){
+    if(window.storage) return await window.storage.get(k);
+    const v = localStorage.getItem(k);
+    if(v === null) throw new Error("not found");
+    return { key:k, value:v };
+  },
+  async set(k,v){
+    if(window.storage) return await window.storage.set(k,v);
+    localStorage.setItem(k,v);
+    return { key:k, value:v };
+  },
+  async del(k){
+    if(window.storage) return await window.storage.delete(k);
+    localStorage.removeItem(k);
+    return { key:k, deleted:true };
+  }
+};
+const $ = id => document.getElementById(id);
+const baht = n => "฿" + Number(n).toLocaleString("en-US");
+const now = () => new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+
+async function load(){
+  try{
+    const r = await store.get(KEY);
+    if(r && r.value) db = JSON.parse(r.value);
+    else db = JSON.parse(JSON.stringify(DEMO));
+  }catch(e){ db = JSON.parse(JSON.stringify(DEMO)); }
+  render();
+}
+async function save(){
+  try{ await store.set(KEY, JSON.stringify(db)); }
+  catch(e){ console.error("save failed", e); }
+  render();
+}
+
+function go(v){
+  ["merchant","shopper","desk"].forEach(n=>{
+    $("v-"+n).hidden = n !== v;
+    $("t-"+n).setAttribute("aria-selected", n===v);
+  });
+  render();
+}
+
+function newCode(){
+  const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for(let i=0;i<6;i++) s += a[Math.floor(Math.random()*a.length)];
+  return s;
+}
+
+function issue(){
+  const store = $("store").value.trim();
+  const amt = parseInt($("amt").value, 10);
+  $("m-err").textContent = "";
+  if(!store){ $("m-err").textContent = "Enter the shop name."; return; }
+  if(!amt || amt < 1){ $("m-err").textContent = "Enter an amount above zero."; return; }
+
+  const t = { code:newCode(), store, amt, at:now() };
+  db.issued.push(t);
+  save();
+
+  $("slip-out").innerHTML =
+    '<div class="slip">' +
+      '<div class="store">'+esc(store)+'</div>' +
+      '<div class="amt">'+baht(amt)+'</div>' +
+      '<div class="meta">'+t.at+' · single use · valid today</div>' +
+      '<div class="rule"></div>' +
+      '<div id="qr"></div>' +
+      '<div class="code">'+t.code+'</div>' +
+    '</div>';
+  new QRCode($("qr"), { text:t.code, width:132, height:132, colorDark:"#17457F", colorLight:"#FBFAF7" });
+  $("amt").value = "";
+}
+
+function claim(){
+  const c = $("code").value.trim().toUpperCase();
+  $("s-err").textContent = "";
+  if(c.length !== 6){ $("s-err").textContent = "Codes are six characters."; return; }
+
+  const i = db.issued.findIndex(t => t.code === c);
+  if(i === -1){ $("s-err").textContent = "No code like that. Check the receipt."; return; }
+  if(db.claimed.some(t => t.code === c)){ $("s-err").textContent = "That code was already used."; return; }
+
+  db.claimed.push(db.issued[i]);
+  $("code").value = "";
+  save();
+}
+
+function redeem(){
+  const plate = $("plate").value.trim();
+  if(!plate){ $("s-err").textContent = "Enter the plate on your car."; return; }
+  db.redemptions.push({
+    plate, total: total(), stores: db.claimed.length, at: now(), done: false
+  });
+  db.claimed = [];
+  $("plate").value = "";
+  save();
+  go("desk");
+}
+
+const total = () => db.claimed.reduce((s,t)=>s+t.amt, 0);
+
+function markDone(i){ db.redemptions[i].done = true; save(); }
+function resetShopper(){ db.claimed = []; save(); }
+async function clearAll(){
+  db = { issued:[], claimed:[], redemptions:[] };
+  await save();
+  $("slip-out").innerHTML = "";
+}
+
+function esc(s){ return s.replace(/[<>&"]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c])); }
+
+function render(){
+  const t = total();
+  $("s-total").textContent = baht(t);
+  const pct = Math.min(100, (t/THRESHOLD)*100);
+  $("s-bar").style.width = pct + "%";
+  $("s-gap").textContent = t >= THRESHOLD
+    ? "Threshold reached — redeem below"
+    : baht(THRESHOLD - t) + " to go";
+  $("s-redeem").hidden = t < THRESHOLD;
+
+  $("s-rows").innerHTML = db.claimed.length
+    ? db.claimed.map(x =>
+        '<div class="row"><b>'+esc(x.store)+'</b><span>'+baht(x.amt)+' · '+x.at+'</span></div>').join("")
+    : '<div class="empty">Nothing added yet. Enter a code from a receipt.</div>';
+
+  const open = db.redemptions.filter(r=>!r.done).length;
+  $("d-list").innerHTML = db.redemptions.length
+    ? db.redemptions.map((r,i) =>
+        '<div class="queue'+(r.done?" done":"")+'">' +
+          '<div class="plate">'+esc(r.plate)+'</div>' +
+          '<div class="det">'+baht(r.total)+' across '+r.stores+' shop'+(r.stores===1?"":"s")+' · '+r.at+'</div>' +
+          (r.done ? '<div class="det">Applied</div>'
+                  : '<button class="ghost" onclick="markDone('+i+')">MARK APPLIED</button>') +
+        '</div>').join("")
+    : '<div class="empty">No redemptions yet.</div>';
+
+  document.title = open ? "("+open+") SlipGo — concierge test" : "SlipGo — concierge test";
+}
+
+load();
+</script>
