@@ -29,6 +29,8 @@ h1{font:700 30px/1 "Barlow Condensed";margin:0}
   background:repeating-linear-gradient(115deg,var(--barrier) 0 13px,#F5F3EE 13px 26px);
   border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
 
+#crash{background:#FBE9E7;border:1.5px solid var(--alert);border-left:6px solid var(--alert);
+  padding:.8rem;margin:1.1rem 0 0;font:600 12px/1.6 "IBM Plex Mono";color:#7A1D12;white-space:pre-wrap}
 .demo-flag{background:#FBF0D8;border:1.5px solid var(--barrier);border-left:6px solid var(--barrier);
   padding:.75rem .85rem;margin:1.1rem 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
 .demo-flag b{display:block;font:600 10px/1 "IBM Plex Mono";letter-spacing:.14em;color:#7A5200;margin-bottom:.35rem}
@@ -200,6 +202,7 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
 </header>
 
 <div class="wrap">
+  <div id="crash" hidden></div>
   <div class="demo-flag">
     <b>DEMO DATA</b>
     The parking session, shops and amounts below are sample data, put there so the flow can be shown
@@ -307,12 +310,17 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
   </section>
 
   <footer>
-    SlipGo prototype · DES:324 · SIIT, Thammasat University<br>
+    SlipGo prototype · DES:324 · SIIT, Thammasat University · <b id="build">BUILD 7</b><br>
     Saved on this device only. Use one phone or one laptop for the whole flow. Do not enter a real plate number.
   </footer>
 </div>
 
 <script>
+window.addEventListener("error", ev => {
+  const c = document.getElementById("crash");
+  if(c){ c.hidden = false; c.textContent = "SCRIPT ERROR\n" + ev.message + "\nline " + ev.lineno; }
+});
+
 const THRESHOLD = 500;      // spend that earns extra free hours
 const BONUS_MIN = 120;      // two extra hours
 const RATE = 30;            // baht per chargeable hour, rounded up
@@ -782,4 +790,20 @@ function render(){
 }
 
 load();
+
+// Self-check, so a broken wiring is visible rather than silent.
+(function(){
+  const ok = [];
+  const bad = [];
+  (typeof picked === "function" ? ok : bad).push("picked");
+  ($("shot") ? ok : bad).push("file input");
+  ($("pastebox") ? ok : bad).push("paste box");
+  (window.jsQR ? ok : bad).push("code reader");
+  if(bad.length){
+    const c = $("crash");
+    if(c){ c.hidden = false; c.textContent = "MISSING: " + bad.join(", "); }
+  }
+  const b = $("build");
+  if(b) b.textContent = "BUILD 7 \u00b7 " + ok.length + "/4 ready";
+})();
 </script>
