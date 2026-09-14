@@ -159,7 +159,12 @@ button.sm.no{border-color:var(--alert);color:var(--alert)}
 .drop kbd{font:600 11px/1 "IBM Plex Mono";background:var(--page);border:1px solid var(--line);
   padding:.1rem .3rem;color:var(--ink)}
 .drop .big{font:700 17px/1.2 "Barlow Condensed";display:block;margin-bottom:.25rem}
-.drop .sm2{font:400 12px/1.4 "IBM Plex Sans";color:var(--slate)}
+.drop .sm2{font:400 12px/1.4 "IBM Plex Sans";color:var(--slate);display:block;margin-bottom:.75rem}
+#pastebox{width:100%;text-align:center;background:var(--page);border:1.5px solid var(--line);
+  padding:.65rem;font:600 13px/1 "IBM Plex Mono";letter-spacing:.06em;color:var(--slate);cursor:pointer}
+#pastebox:focus{outline:0;border-color:var(--signage);background:#fff;color:var(--ink)}
+.drop .pick{display:inline-block;margin-top:.6rem;font:600 10px/1 "IBM Plex Mono";letter-spacing:.1em;
+  color:var(--signage);cursor:pointer;text-decoration:underline}
 #shot{display:none}
 .preview{margin-top:.9rem;display:flex;gap:.8rem;align-items:flex-start}
 .preview img{width:92px;border:1.5px solid var(--line);display:block}
@@ -236,11 +241,13 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
 
     <div class="addhd">ADD A RECEIPT</div>
 
-    <label class="drop" for="shot" id="dropzone">
-      <span class="big">Scan, upload or paste your receipt</span>
-      <span class="sm2">Photograph the slip, drag it in, or press <kbd>&#8984;V</kbd></span>
-    </label>
-    <input type="file" id="shot" accept="image/*" capture="environment" onchange="picked(event)">
+    <div class="drop" id="dropzone">
+      <span class="big">Add your receipt</span>
+      <span class="sm2">Click the box below and press <kbd>&#8984;V</kbd>, drag an image in, or choose a file</span>
+      <input type="text" id="pastebox" placeholder="Click here, then press &#8984;V" readonly>
+      <label class="pick" for="shot">or choose a file</label>
+      <input type="file" id="shot" accept="image/*" onchange="picked(event)">
+    </div>
     <div id="prev"></div>
 
     <details class="manual">
@@ -425,7 +432,8 @@ function claim(){
 
 function picked(ev){
   const f = ev.target.files && ev.target.files[0];
-  if(f) handleImage(f);
+  if(f){ handleImage(f); return; }
+  $("s-err").textContent = "No image came through. Try choosing it from your photos instead.";
 }
 
 function handleImage(file){
@@ -502,6 +510,7 @@ function runSteps(small, decode){
           mark("st4","ok","Added");
           db.claimed.push(Object.assign({}, t, { tier:2 }));
           $("shot").value = "";
+          if($("pastebox")) $("pastebox").value = "";
           save();
           flashFee();
           setTimeout(() => { $("prev").innerHTML = ""; }, quick ? 0 : 3500);
@@ -546,6 +555,18 @@ function onPaste(e){
   $("s-err").textContent = "That paste held no image (" + types + ").";
 }
 
+// The paste box is an input, so it reliably receives the event once clicked.
+function wirePasteBox(){
+  const b = $("pastebox");
+  if(b){
+    b.addEventListener("paste", onPaste);
+    b.addEventListener("focus", () => { $("s-err").textContent = ""; });
+  }
+  const c = $("code");
+  if(c) c.addEventListener("paste", onPaste);
+}
+wirePasteBox();
+
 // Listen in several places, because a page with nothing focused can miss the event.
 document.addEventListener("paste", onPaste);
 window.addEventListener("paste", onPaste, true);
@@ -554,7 +575,8 @@ document.body && document.body.addEventListener("paste", onPaste);
 // Give the page something focusable so the browser routes paste to it.
 document.body.setAttribute("tabindex", "-1");
 window.addEventListener("load", () => {
-  try{ document.body.focus({ preventScroll:true }); }catch(e){ document.body.focus(); }
+  const b = $("pastebox");
+  if(b){ try{ b.focus({ preventScroll:true }); }catch(e){ b.focus(); } }
 });
 document.addEventListener("click", e => {
   const t = e.target;
@@ -583,34 +605,45 @@ document.addEventListener("click", e => {
 function readCode(img){
   if(!window.jsQR){ return { err:"reader" }; }
   if(!img){ return { err:"image" }; }
+  const iw = img.naturalWidth || img.width;
+  if(!iw) return { err:"image" };
 
-  const sizes = [img.naturalWidth || img.width, 1600, 1100, 800];
-  for(const w of sizes){
-    if(!w) continue;
-    const hit = tryAt(img, w);
+  // Whole frame, a few sizes. A phone photo is large, a screenshot is small.
+  for(const w of [1800, 1300, 1000, 700, iw]){
+    const hit = tryAt(img, w, null);
+    if(hit) return { code:hit };
+  }
+  // Then the middle of the frame, in case the QR is small and off to one side.
+  for(const box of [[0.15,0.15,0.7,0.7],[0,0.4,1,0.6],[0,0,1,0.5]]){
+    const hit = tryAt(img, 1400, box);
     if(hit) return { code:hit };
   }
   return { err:"nocode" };
 }
 
-function tryAt(img, targetW){
+function tryAt(img, targetW, box){
   try{
     const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
     if(!iw || !ih) return null;
-    const sc = targetW / iw;
+    const sx = box ? Math.round(iw*box[0]) : 0;
+    const sy = box ? Math.round(ih*box[1]) : 0;
+    const sw = box ? Math.round(iw*box[2]) : iw;
+    const sh = box ? Math.round(ih*box[3]) : ih;
+    const sc = Math.min(targetW / sw, 3);
+    const cw = Math.max(1, Math.round(sw*sc)), ch = Math.max(1, Math.round(sh*sc));
+    if(cw > 3000 || ch > 3000 || cw < 40 || ch < 40) return null;
+
     const cv = document.createElement("canvas");
-    cv.width = Math.max(1, Math.round(iw*sc));
-    cv.height = Math.max(1, Math.round(ih*sc));
-    if(cv.width > 4000 || cv.height > 4000) return null;
+    cv.width = cw; cv.height = ch;
     const ctx = cv.getContext("2d", { willReadFrequently:true });
-    ctx.drawImage(img, 0, 0, cv.width, cv.height);
-    const d = ctx.getImageData(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    const d = ctx.getImageData(0, 0, cw, ch);
     const q = jsQR(d.data, d.width, d.height, { inversionAttempts:"attemptBoth" });
     if(q && q.data){
       const m = String(q.data).toUpperCase().match(/[A-Z0-9]{6}/);
       if(m) return m[0];
     }
-  }catch(e){ /* try the next size */ }
+  }catch(e){ /* next attempt */ }
   return null;
 }
 
@@ -636,7 +669,7 @@ function askForCode(small, why){
     ? "The code reader did not load, so we cannot check the slip automatically. Type the code, or send it to be checked."
     : why === "image"
     ? "We could not open that image. Type the code, or send it to be checked."
-    : "This shop has probably not joined yet. Send it to us and we will check it by hand, or type the code if you can see one.";
+    : "Either this shop has not joined, or the code was not sharp enough to read. Type the code from the slip, or send it to be checked by hand.";
   const hd = why === "nocode" ? "No SlipGo code found on this slip" : "Could not read the slip";
   $("prev").innerHTML =
     '<div class="preview"><img src="'+small+'" alt="The receipt you uploaded">' +
