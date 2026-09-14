@@ -91,9 +91,15 @@ button.sm.no{border-color:var(--alert);color:var(--alert)}
 .manual summary:focus-visible{outline:3px solid var(--barrier);outline-offset:2px}
 .nocode{font-size:11.5px;color:var(--slate);margin-top:.4rem;line-height:1.5}
 .nocodehd{font:600 10px/1.4 "IBM Plex Mono";letter-spacing:.1em;color:var(--alert)}
-.steps{display:flex;gap:.9rem;align-items:flex-start;background:var(--card);
-  border:1.5px solid var(--line);padding:.85rem;margin-top:.8rem}
-.steps img{width:84px;border:1.5px solid var(--line);display:block;flex:none}
+.steps{display:flex;gap:1rem;align-items:flex-start;background:var(--card);
+  border:1.5px solid var(--line);padding:.95rem;margin-top:.8rem}
+.stepimg{flex:none}
+.steps img{width:92px;border:1.5px solid var(--line);display:block}
+.stepcap{font:600 8px/1 "IBM Plex Mono";letter-spacing:.14em;color:var(--slate);
+  text-align:center;margin-top:.35rem}
+.stepbar{height:4px;background:var(--line);margin:.15rem 0 .6rem}
+.stepbar i{display:block;height:100%;width:0;background:var(--barrier);
+  transition:width .4s cubic-bezier(.4,0,.2,1)}
 .stepside{flex:1;min-width:0}
 .step{display:flex;gap:.55rem;align-items:flex-start;padding:.3rem 0;font-size:13px;
   color:var(--line);transition:color .25s}
@@ -109,6 +115,15 @@ button.sm.no{border-color:var(--alert);color:var(--alert)}
 .step.no i{background:var(--alert);border-color:var(--alert)}
 .step.skip{color:var(--slate)}
 .step.skip i{border-style:dotted}
+.step.wait{color:var(--barrier)}
+.step.wait i{border-color:var(--barrier);background:var(--barrier)}
+#stfoot:not(:empty){margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(--line)}
+.stopmsg{font-size:13px;color:var(--alert);line-height:1.45;margin-bottom:.55rem}
+.okmsg{font-size:13px;color:var(--good);line-height:1.45;margin-bottom:.55rem}
+.confirmline{font-size:13.5px;color:var(--ink);line-height:1.45;margin-bottom:.55rem}
+.confirmline b{font-weight:600}
+.stepacts{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center}
+.stepacts .go{padding:.6rem;font-size:15px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .bump{animation:bump .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
@@ -310,7 +325,7 @@ footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
   </section>
 
   <footer>
-    SlipGo prototype · DES:324 · SIIT, Thammasat University · <b id="build">BUILD 8</b><br>
+    SlipGo prototype · DES:324 · SIIT, Thammasat University · <b id="build">BUILD 10</b><br>
     Saved on this device only. Use one phone or one laptop for the whole flow. Do not enter a real plate number.
   </footer>
 </div>
@@ -479,68 +494,144 @@ function handleImage(file){
 // Walk through the check one line at a time, so the steps are visible.
 function runSteps(small, decode){
   const quick = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const gap = quick ? 0 : 700;
+  const gap = quick ? 0 : 850;
+
+  const rows = [
+    ["st1", "Reading the slip"],
+    ["st2", "Looking for a SlipGo code"],
+    ["st3", "Checking which shop issued it"],
+    ["st4", "Reading the amount"],
+    ["st5", "Checking it has not been used"],
+    ["st6", "Ready to add"]
+  ];
 
   $("prev").innerHTML =
-    '<div class="steps"><img src="'+small+'" alt="The receipt you added">' +
-    '<div class="stepside">' +
-      '<div class="step" id="st1"><i></i><span>Reading the slip</span></div>' +
-      '<div class="step" id="st2"><i></i><span>Looking for a SlipGo code</span></div>' +
-      '<div class="step" id="st3"><i></i><span>Checking it against the shop</span></div>' +
-      '<div class="step" id="st4"><i></i><span>Adding to your parking</span></div>' +
-    '</div></div>';
+    '<div class="steps">' +
+      '<div class="stepimg"><img src="' + small + '" alt="The receipt you added">' +
+        '<div class="stepcap">RECEIPT</div></div>' +
+      '<div class="stepside">' +
+        '<div class="stepbar"><i id="stbar"></i></div>' +
+        rows.map(r => '<div class="step" id="' + r[0] + '"><i></i><span>' + r[1] + '</span></div>').join("") +
+        '<div id="stfoot"></div>' +
+      '</div>' +
+    '</div>';
 
+  let done = 0;
+  const bar = () => { const b = $("stbar"); if(b) b.style.width = Math.round((done/rows.length)*100) + "%"; };
   const mark = (id, state, text) => {
     const el = $(id); if(!el) return;
     el.className = "step " + state;
     if(text) el.querySelector("span").innerHTML = text;
+    if(state === "ok" || state === "no"){ done++; bar(); }
   };
 
-  mark("st1","run");
-  setTimeout(() => {
-    mark("st1","ok");
-    mark("st2","run");
+  // A failure stays on screen until the person clears it.
+  const stop = (id, msg, why) => {
+    mark(id, "no", msg);
+    rows.slice(rows.findIndex(r => r[0] === id) + 1)
+        .forEach(r => { const el = $(r[0]); if(el) el.className = "step skip"; });
+    const foot = $("stfoot");
+    if(foot){
+      foot.innerHTML =
+        '<div class="stopmsg">' + msg + '</div>' +
+        '<div class="stepacts">' +
+          (why === "used" ? '' :
+            '<button class="sm" onclick="retryWithCode()">TYPE THE CODE</button>' +
+            '<button class="sm" onclick="noCode()">SEND TO BE CHECKED</button>') +
+          '<button class="sm no" onclick="clearSteps()">DISMISS</button>' +
+        '</div>';
+    }
+  };
 
+  let found = null, tx = null;
+  const seq = [];
+
+  seq.push(() => { mark("st1","run"); });
+  seq.push(() => { mark("st1","ok"); mark("st2","run"); });
+  seq.push(() => {
     const r = decode();
+    if(!r.code){
+      stop("st2", r.err === "reader" ? "The code reader did not load." : "No SlipGo code found on this slip.",
+           r.err === "reader" ? "reader" : "nocode");
+      return false;
+    }
+    found = r.code;
+    mark("st2","ok","Code found &middot; <b>" + found + "</b>");
+    mark("st3","run");
+  });
+  seq.push(() => {
+    tx = db.issued.find(x => x.code === found);
+    if(!tx){ stop("st3","That code is not from a shop that has joined.","nocode"); return false; }
+    mark("st3","ok", esc(tx.store));
+    mark("st4","run");
+  });
+  seq.push(() => {
+    mark("st4","ok", "<b>" + baht(tx.amt) + "</b> on this receipt");
+    mark("st5","run");
+  });
+  seq.push(() => {
+    if(db.claimed.some(x => x.code === found)){
+      stop("st5","This receipt has already been used today.","used"); return false;
+    }
+    mark("st5","ok","Single use &middot; not claimed before");
+    mark("st6","run");
+  });
+  seq.push(() => {
+    mark("st6","wait","Waiting for you to confirm");
+    const foot = $("stfoot");
+    if(foot){
+      pendingAdd = tx;
+      foot.innerHTML =
+        '<div class="confirmline">Add <b>' + baht(tx.amt) + '</b> from ' + esc(tx.store) + ' to your parking?</div>' +
+        '<div class="stepacts">' +
+          '<button class="go" style="flex:1" onclick="confirmAdd()">Confirm</button>' +
+          '<button class="sm" onclick="clearSteps()">CANCEL</button>' +
+        '</div>';
+    }
+  });
 
-    setTimeout(() => {
-      if(!r.code){
-        mark("st2","no", r.err === "reader" ? "Code reader did not load" : "No SlipGo code on this slip");
-        mark("st3","skip","Cannot verify automatically");
-        mark("st4","skip","Needs a person to check it");
-        setTimeout(() => askForCode(small, r.err), gap);
-        return;
-      }
+  let i = 0;
+  const tick = () => {
+    if(i >= seq.length) return;
+    const keepGoing = seq[i++]();
+    if(keepGoing === false) return;
+    setTimeout(tick, gap);
+  };
+  tick();
+}
 
-      mark("st2","ok","Code found: <b>"+r.code+"</b>");
-      mark("st3","run");
+let pendingAdd = null;
 
-      setTimeout(() => {
-        const t = db.issued.find(x => x.code === r.code);
-        const used = db.claimed.some(x => x.code === r.code);
+function confirmAdd(){
+  if(!pendingAdd) return;
+  const tx = pendingAdd; pendingAdd = null;
+  if(db.claimed.some(x => x.code === tx.code)){ clearSteps(); return; }
+  db.claimed.push(Object.assign({}, tx, { tier:2 }));
+  $("shot").value = "";
+  if($("pastebox")) $("pastebox").value = "";
+  const reached = total() >= THRESHOLD;
+  const el = $("st6");
+  if(el){ el.className = "step ok"; el.querySelector("span").innerHTML = "Added to your parking"; }
+  const foot = $("stfoot");
+  if(foot){
+    foot.innerHTML = '<div class="okmsg">' +
+      (reached ? "Threshold reached &middot; two extra hours applied" : "Added to today's total") +
+      '</div><div class="stepacts"><button class="sm" onclick="clearSteps()">DONE</button></div>';
+  }
+  save();
+  flashFee();
+}
 
-        if(!t || used){
-          mark("st3","no", used ? "That receipt was already used" : "Code is not from a joined shop");
-          mark("st4","skip","Not added");
-          setTimeout(() => askForCode(small, "nocode"), gap);
-          return;
-        }
+function clearSteps(){
+  pendingAdd = null;
+  $("prev").innerHTML = "";
+  $("shot").value = "";
+  if($("pastebox")) $("pastebox").value = "";
+}
 
-        mark("st3","ok", esc(t.store) + " &middot; " + baht(t.amt));
-        mark("st4","run");
-
-        setTimeout(() => {
-          mark("st4","ok","Added");
-          db.claimed.push(Object.assign({}, t, { tier:2 }));
-          $("shot").value = "";
-          if($("pastebox")) $("pastebox").value = "";
-          save();
-          flashFee();
-          setTimeout(() => { $("prev").innerHTML = ""; }, quick ? 0 : 3500);
-        }, gap);
-      }, gap);
-    }, gap);
-  }, gap);
+function retryWithCode(){
+  const img = $("prev").dataset.img || "";
+  askForCode(img, "nocode");
 }
 
 function flashFee(){
@@ -817,6 +908,6 @@ load();
     if(c){ c.hidden = false; c.textContent = "MISSING: " + bad.join(", "); }
   }
   const b = $("build");
-  if(b) b.textContent = "BUILD 8 \u00b7 " + ok.length + "/4 ready";
+  if(b) b.textContent = "BUILD 10 \u00b7 " + ok.length + "/4 ready";
 })();
 </script>
