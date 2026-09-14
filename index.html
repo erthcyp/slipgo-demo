@@ -516,16 +516,50 @@ function flashFee(){
   el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
 }
 
-// Paste an image from the clipboard, anywhere on the page.
-document.addEventListener("paste", e => {
+// Paste an image from the clipboard.
+let lastPaste = 0;
+function onPaste(e){
   if($("v-shopper").hidden) return;
-  const items = (e.clipboardData || {}).items || [];
+  const t = Date.now();
+  if(t - lastPaste < 400) return;
+  lastPaste = t;
+  const cd = e.clipboardData || window.clipboardData;
+  if(!cd) return;
+
+  let file = null;
+  const items = cd.items || [];
   for(const it of items){
-    if(it.type && it.type.indexOf("image") === 0){
-      const f = it.getAsFile();
-      if(f){ e.preventDefault(); handleImage(f); return; }
+    if(it.kind === "file" || (it.type && it.type.indexOf("image") === 0)){
+      const f = it.getAsFile && it.getAsFile();
+      if(f){ file = f; break; }
     }
   }
+  if(!file && cd.files && cd.files.length){
+    for(const f of cd.files){
+      if(f.type && f.type.indexOf("image") === 0){ file = f; break; }
+    }
+  }
+
+  if(file){ e.preventDefault(); handleImage(file); return; }
+
+  const types = Array.from(cd.types || []).join(", ") || "nothing";
+  $("s-err").textContent = "That paste held no image (" + types + ").";
+}
+
+// Listen in several places, because a page with nothing focused can miss the event.
+document.addEventListener("paste", onPaste);
+window.addEventListener("paste", onPaste, true);
+document.body && document.body.addEventListener("paste", onPaste);
+
+// Give the page something focusable so the browser routes paste to it.
+document.body.setAttribute("tabindex", "-1");
+window.addEventListener("load", () => {
+  try{ document.body.focus({ preventScroll:true }); }catch(e){ document.body.focus(); }
+});
+document.addEventListener("click", e => {
+  const t = e.target;
+  if(t && /^(INPUT|TEXTAREA|BUTTON|A|SUMMARY|LABEL)$/.test(t.tagName)) return;
+  try{ document.body.focus({ preventScroll:true }); }catch(e){}
 });
 
 // Drag an image file straight onto the box.
